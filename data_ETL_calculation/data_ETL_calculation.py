@@ -718,10 +718,7 @@ class Main(object, metaclass=Singleton):
             logger.info("Row {0}: {1} {2} done.".format(i, loggerText1, loggerText2))
 
     def GetResultsForSlide5(self, dbOps, cursor, initStruct, resultDictOverall, resultDictIDC5, resultDictJLR, resultDictMAP, logger):
-         if KeyError:
-            pass
-
-        else:
+        try:
             # get created Issues (not subtasks) in specific CW for all projects
             dataset = dbOps.getMainTasksCreatedInGivenCW(cursor, initStruct['week_start_date'].strftime('%y-%m-%d %H:%M'), initStruct['week_end_date'].strftime('%y-%m-%d %H:%M'), pd)
             #logger.info("    Open tickets:")
@@ -778,12 +775,13 @@ class Main(object, metaclass=Singleton):
             tasksClosedMAP = tasksClosed[tasksClosed[0] == 'DAI DASy MAP']   # take care to Project Name column index in dataset if add/remove columns in SELECT
             resultDictMAP['ClosedTicketsTotal_perCW'] = tasksClosedMAP.shape[0]
             #logger.info('\tMAP: {}'.format(resultsList.resultDictMAP['ClosedTicketsTotal_perCW']))
+        
+        except KeyError:
+            exit()
 
     def GetResultsForSlide6(self, dbOps, cursor, initStruct, resultDictIDC5, resultDictJLR, resultDictMAP, logger):
-         if KeyError:
-            pass
-
-        else:
+        
+        try:
             dataset = dbOps.getSubtasksStoryPointsCreatedInGivenCW(cursor, initStruct['week_start_date'].strftime('%y-%m-%d %H:%M'), initStruct['week_end_date'].strftime('%y-%m-%d %H:%M'), pd)
 
             #logger.info("    JLR: ")
@@ -807,50 +805,59 @@ class Main(object, metaclass=Singleton):
             #logger.info('\tNew tickets: {}'.format(resultsList.resultDictMAP['OpenTickets_perCW_Count']))
             #logger.info('\tSubTasks story points sum: {}'.format(resultsList.resultDictMAP['OpenTickets_perCW_SPsum']))
 
+        except KeyError:
+            print("KeyError: Please, insert subtasks")
+            exit()
+
     def GetResultsForSlide7(self, dbOps, cursor, initStruct, resultDictOverall, logger):
-        # get SP of Closed Subtasks of tasks (with subtasks)
-        dataset1 = dbOps.getSubtasksStoryPointsClosedInGivenCW(cursor, initStruct['week_start_date'].strftime('%y-%m-%d %H:%M'), initStruct['week_end_date'].strftime('%y-%m-%d %H:%M'), pd)
-        if dataset1[1].iloc[0] != '':
-            totalSPofClosedSubtasks = dataset1[1].iloc[0]
-        else:
-            totalSPofClosedSubtasks = 0
 
-        # get SP of Closed tasks (without subtasks)
-        dataset2 = dbOps.getMainTasksStoryPointsClosedInGivenCW(cursor, initStruct['week_start_date'].strftime('%y-%m-%d %H:%M'), initStruct['week_end_date'].strftime('%y-%m-%d %H:%M'), pd)
-        if dataset2[1].iloc[0] != '':
-            totalSPofClosedTasks = dataset1[1].iloc[0]
-        else:
-            totalSPofClosedTasks = 0
+        try:
 
-        resultDictOverall['ActualTestedReq_SPsum'] = float(totalSPofClosedSubtasks + totalSPofClosedTasks)
-        #logger.info("    Actual tested Req. (IST): {}".format(resultDictOverall['ActualTestedReq_SPsum']))
+            # get SP of Closed Subtasks of tasks (with subtasks)
+            dataset1 = dbOps.getSubtasksStoryPointsClosedInGivenCW(cursor, initStruct['week_start_date'].strftime('%y-%m-%d %H:%M'), initStruct['week_end_date'].strftime('%y-%m-%d %H:%M'), pd)
+            if dataset1[1].iloc[0] != '':
+                totalSPofClosedSubtasks = dataset1[1].iloc[0]
+            else:
+                totalSPofClosedSubtasks = 0
 
-        # get SP of Open Subtasks of tasks (with subtasks)
-        dataset3 = dbOps.getSubtasksStoryPointsOpen(cursor, pd)
-        if dataset3[1].iloc[0] != '':
-            totalSPofOpenSubtasks = dataset3[1].iloc[0]
-        else:
-            totalSPofOpenSubtasks = 0
+            # get SP of Closed tasks (without subtasks)
+            dataset2 = dbOps.getMainTasksStoryPointsClosedInGivenCW(cursor, initStruct['week_start_date'].strftime('%y-%m-%d %H:%M'), initStruct['week_end_date'].strftime('%y-%m-%d %H:%M'), pd)
+            if dataset2[1].iloc[0] != '':
+                totalSPofClosedTasks = dataset1[1].iloc[0]
+            else:
+                totalSPofClosedTasks = 0
 
-        # get SP of Open tasks (without subtasks)
-        dataset4 = dbOps.getMainTasksStoryPointsOpen(cursor, pd)
-        if dataset4[1].iloc[0] != '':
-            totalSPofOpenTasks = dataset4[1].iloc[0]
-        else:
-            totalSPofOpenTasks = 0
+            resultDictOverall['ActualTestedReq_SPsum'] = float(totalSPofClosedSubtasks + totalSPofClosedTasks)
+            #logger.info("    Actual tested Req. (IST): {}".format(resultDictOverall['ActualTestedReq_SPsum']))
 
-        resultDictOverall['ActualInProgress_SPsum'] = float(totalSPofOpenSubtasks + totalSPofOpenTasks)
-        #logger.info("    Actual In Progress (IST): {}".format(resultDictOverall['ActualInProgress_SPsum']))
-        resultDictOverall['ActualBlockedReq_SPsum'] = 0
-        #logger.info("    Actual blocked Req. (IST): {}".format(resultDictOverall['ActualBlockedReq_SPsum']))
-        resultDictOverall['ActualSummaryReq_SPsum'] = float(resultDictOverall['ActualTestedReq_SPsum'] + resultDictOverall['ActualInProgress_SPsum'] + resultDictOverall['ActualBlockedReq_SPsum'])
-        #logger.info("    Actual Summary (IST): {}".format(resultDictOverall['ActualSummaryReq_SPsum']))
+            # get SP of Open Subtasks of tasks (with subtasks)
+            dataset3 = dbOps.getSubtasksStoryPointsOpen(cursor, pd)
+            if dataset3[1].iloc[0] != '':
+                totalSPofOpenSubtasks = dataset3[1].iloc[0]
+            else:
+                totalSPofOpenSubtasks = 0
+
+            # get SP of Open tasks (without subtasks)
+            dataset4 = dbOps.getMainTasksStoryPointsOpen(cursor, pd)
+            if dataset4[1].iloc[0] != '':
+                totalSPofOpenTasks = dataset4[1].iloc[0]
+            else:
+                totalSPofOpenTasks = 0
+
+            resultDictOverall['ActualInProgress_SPsum'] = float(totalSPofOpenSubtasks + totalSPofOpenTasks)
+            #logger.info("    Actual In Progress (IST): {}".format(resultDictOverall['ActualInProgress_SPsum']))
+            resultDictOverall['ActualBlockedReq_SPsum'] = 0
+            #logger.info("    Actual blocked Req. (IST): {}".format(resultDictOverall['ActualBlockedReq_SPsum']))
+            resultDictOverall['ActualSummaryReq_SPsum'] = float(resultDictOverall['ActualTestedReq_SPsum'] + resultDictOverall['ActualInProgress_SPsum'] + resultDictOverall['ActualBlockedReq_SPsum'])
+            #logger.info("    Actual Summary (IST): {}".format(resultDictOverall['ActualSummaryReq_SPsum']))
+
+        except KeyError:
+            print("KeyError: Please, insert subtasks")
+            exit()
 
     def GetResultsForSlide8(self, dbOps, cursor, initStruct, resultDictIDC5, logger):
-         if KeyError:
-            pass
-
-        else:
+        
+        try:
             # get SP of Closed Subtasks of tasks (with subtasks) for IDC5
             dataset1 = dbOps.getSubtasksStoryPointsClosedInGivenCW_IDC5(cursor, initStruct['week_start_date'].strftime('%y-%m-%d %H:%M'), initStruct['week_end_date'].strftime('%y-%m-%d %H:%M'), pd)
             if dataset1[1].iloc[0] != '':
@@ -889,11 +896,13 @@ class Main(object, metaclass=Singleton):
             resultDictIDC5['ActualSummaryReq_SPsum'] = float(resultDictIDC5['ActualTestedReq_SPsum'] + resultDictIDC5['ActualInProgress_SPsum'] + resultDictIDC5['ActualBlockedReq_SPsum'])
             #logger.info("    Actual Summary (IST): {}".format(resultDictIDC5['ActualSummaryReq_SPsum']))
 
-    def GetResultsForSlide9(self, dbOps, cursor, initStruct, resultDictMAP, logger):
-         if KeyError:
-            pass
+        except KeyError:
+            print("KeyError: Please, insert subtasks")
+            exit()
 
-        else:
+    def GetResultsForSlide9(self, dbOps, cursor, initStruct, resultDictMAP, logger):
+
+        try:
             # get SP of Closed Subtasks of tasks (with subtasks) for MAP
             dataset1 = dbOps.getSubtasksStoryPointsClosedInGivenCW_MAP(cursor, initStruct['week_start_date'].strftime('%y-%m-%d %H:%M'), initStruct['week_end_date'].strftime('%y-%m-%d %H:%M'), pd)
             if dataset1[1].iloc[0] != '':
@@ -932,11 +941,13 @@ class Main(object, metaclass=Singleton):
             resultDictMAP['ActualSummaryReq_SPsum'] = float(resultDictMAP['ActualTestedReq_SPsum'] + resultDictMAP['ActualInProgress_SPsum'] + resultDictMAP['ActualBlockedReq_SPsum'])
             #logger.info("    Actual Summary (IST): {}".format(resultDictMAP['ActualSummaryReq_SPsum']))
 
-    def GetResultsForSlide10(self, dbOps, cursor, initStruct, resultDictJLR, logger):
-        if KeyError:
-            pass
+        except KeyError:
+            print("KeyError: Please, insert subtasks")
+            exit()
 
-        else:
+    def GetResultsForSlide10(self, dbOps, cursor, initStruct, resultDictJLR, logger):
+
+        try:
 
             # get SP of Closed Subtasks of tasks (with subtasks)
             dataset1 = dbOps.getSubtasksStoryPointsClosedInGivenCW_JLR(cursor, initStruct['week_start_date'].strftime('%y-%m-%d %H:%M'), initStruct['week_end_date'].strftime('%y-%m-%d %H:%M'), pd)
@@ -975,6 +986,10 @@ class Main(object, metaclass=Singleton):
             #logger.info("    Actual blocked Req. (IST): {}".format(resultDictJLR['ActualBlockedReq_SPsum']))
             resultDictJLR['ActualSummaryReq_SPsum'] = float(resultDictJLR['ActualTestedReq_SPsum'] + resultDictJLR['ActualInProgress_SPsum'] + resultDictJLR['ActualBlockedReq_SPsum'])
             #logger.info("    Actual Summary (IST): {}".format(resultDictJLR['ActualSummaryReq_SPsum']))
+
+        except KeyError:
+            print("KeyError: Please, insert subtasks")
+            exit()
 
     def main(self):
         initStruct = {}
