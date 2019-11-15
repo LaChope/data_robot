@@ -1,0 +1,24 @@
+{
+	"issue": 
+	[
+		{
+			 "IssueType": "Issue Type", 
+			 "ProjectID": "Project", 
+			 "Component": "Component/s", 
+			 "IssueKey": "Key", 
+			 "Summary": "Summary", 
+			 "ProblemType": "Problem Type", 
+			 "Priority": "Priority", 
+			 "Assignee": "Assignee", 
+			 "Status": "Status", 
+			 "StoryPoints": "Story Points", 
+			 "Created": "Created", 
+			 "DueDate": "Due Date", 
+			 "AffectsVersion": "Affects Version/s", 
+			 "SubTasks": "Sub-Tasks", 
+			 "Resolved": "Resolved", 
+			 "FixVersion": "Fix Version/s", 
+			 "Labels": "Labels"
+		}
+	]
+}
