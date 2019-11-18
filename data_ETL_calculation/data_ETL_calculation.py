@@ -959,7 +959,7 @@ class Main(object, metaclass=Singleton):
             if dataset5[1].iloc[0] != '':
                 totalSPofBlockedTasksIDC5 = dataset5[1].iloc[0]
             else:
-                totalSPofBlockedTasks = 0
+                totalSPofBlockedTasksIDC5 = 0
 
             resultDictIDC5['ActualInProgress_SPsum'] = float(totalSPofOpenSubtasksIDC5 + totalSPofOpenTasksIDC5)
             #logger.info("    Actual In Progress (IST): {}".format(resultDictIDC5['ActualInProgress_SPsum']))
@@ -1072,6 +1072,10 @@ class Main(object, metaclass=Singleton):
             #logger.info("    Actual blocked Req. (IST): {}".format(resultDictJLR['ActualBlockedReq_SPsum']))
             resultDictJLR['ActualSummaryReq_SPsum'] = float(resultDictJLR['ActualTestedReq_SPsum'] + resultDictJLR['ActualInProgress_SPsum'] + resultDictJLR['ActualBlockedReq_SPsum'])
             #logger.info("    Actual Summary (IST): {}".format(resultDictJLR['ActualSummaryReq_SPsum']))
+
+        except KeyError:
+            print("KeyError: Please, insert subtasks")
+            exit()
 
     def main(self):
         initStruct = {}
