@@ -17,8 +17,9 @@
 			 "AffectsVersion": "Affects Version/s", 
 			 "SubTasks": "Sub-Tasks", 
 			 "Resolved": "Resolved", 
-			 "FixVersion": "Fix Version/s", 
-			 "Labels": "Labels"
+			 "FixVersion": "Fix Version/s",
+			 "Labels": "Labels",
+			 "Flagged": "Flagged"
 		}
 	]
 }

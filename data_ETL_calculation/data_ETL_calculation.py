@@ -6,7 +6,7 @@ from datetime import datetime
 from datetime import timedelta
 from os.path import join as pjoin
 from openpyxl.utils import get_column_letter
-#from requests_oauthlib import OAuth1
+
 
 # --- Global Variables ----------------------------------------------------------------------------
 INIFILENAME = "data_ETL_service.ini"
@@ -100,6 +100,7 @@ class DatabaseOperations():
         dataset = pd.DataFrame(data=sqlData)
         dataset = dataset.fillna('')
         return dataset
+
     # overall ----------------------------------------------------------------------------
     def getSubtasksStoryPointsClosedInGivenCW(self, cursor, cwStart, cwEnd, pd):
         query = "SELECT Project.Name, SUM (SubTask.StoryPoints) \
@@ -159,6 +160,19 @@ class DatabaseOperations():
         dataset = dataset.fillna('')
         return dataset
 
+    def getMainTasksStoryPointsBlocked(self, cursor, pd):
+        query = "SELECT Project.Name, SUM(Issue.StoryPoints) \
+                FROM Issue \
+                JOIN Project ON Issue.ProjectID = Project.ProjectID \
+                WHERE Issue.Flagged LIKE '%Impediment%' \
+                    AND Issue.Status != 'Closed' \
+                    AND (Issue.Assignee NOT LIKE '%Jan%' OR Issue.Assignee NOT LIKE '%Andrei%')"
+        cursor.execute(query)
+        sqlData = cursor.fetchall()
+        dataset = pd.DataFrame(data=sqlData)
+        dataset = dataset.fillna('')
+        return dataset
+    
     
     # IDC5 ----------------------------------------------------------------------------
     def getSubtasksStoryPointsClosedInGivenCW_IDC5(self, cursor, cwStart, cwEnd, pd):
@@ -222,6 +236,21 @@ class DatabaseOperations():
         dataset = pd.DataFrame(data=sqlData)
         dataset = dataset.fillna('')
         return dataset
+
+
+    def getMainTasksStoryPointsBlocked_IDC5(self, cursor, pd):
+        query = "SELECT Project.Name, SUM(Issue.StoryPoints) \
+                FROM Issue \
+                JOIN Project ON Issue.ProjectID = Project.ProjectID \
+                WHERE Project.Name = 'DAI DASy IDC5' \
+                    AND Issue.Flagged LIKE '%Impediment%' \
+                    AND Issue.Status != 'Closed' "
+        cursor.execute(query)
+        sqlData = cursor.fetchall()
+        dataset = pd.DataFrame(data=sqlData)
+        dataset = dataset.fillna('')
+        return dataset
+    
     # MAP ----------------------------------------------------------------------------
     def getSubtasksStoryPointsClosedInGivenCW_MAP(self, cursor, cwStart, cwEnd, pd):
         query = "SELECT Project.Name, SUM (SubTask.StoryPoints) \
@@ -284,6 +313,21 @@ class DatabaseOperations():
         dataset = pd.DataFrame(data=sqlData)
         dataset = dataset.fillna('')
         return dataset
+
+    def getMainTasksStoryPointsBlocked_MAP(self, cursor, pd):
+        query = "SELECT Project.Name, SUM(Issue.StoryPoints) \
+                FROM Issue \
+                JOIN Project ON Issue.ProjectID = Project.ProjectID \
+                WHERE Project.Name = 'DAI DASy MAP' \
+                    AND Issue.Flagged LIKE '%Impediment%' \
+                    AND Issue.Status != 'Closed'"
+        cursor.execute(query)
+        sqlData = cursor.fetchall()
+        dataset = pd.DataFrame(data=sqlData)
+        dataset = dataset.fillna('')
+        return dataset
+
+
     # JLR ----------------------------------------------------------------------------
     def getSubtasksStoryPointsClosedInGivenCW_JLR(self, cursor, cwStart, cwEnd, pd):
         query = "SELECT Project.Name, SUM (SubTask.StoryPoints) \
@@ -341,6 +385,19 @@ class DatabaseOperations():
                     AND SubTask.Status <> 'Closed' \
                     AND Issue.SubTasks = 'None' \
                     AND (Issue.Assignee NOT LIKE '%Jan%' OR Issue.Assignee NOT LIKE '%Andrei%')"
+        cursor.execute(query)
+        sqlData = cursor.fetchall()
+        dataset = pd.DataFrame(data=sqlData)
+        dataset = dataset.fillna('')
+        return dataset
+
+    def getMainTasksStoryPointsBlocked_JLR(self, cursor, pd):
+        query = "SELECT Project.Name, SUM(Issue.StoryPoints) \
+                FROM Issue \
+                JOIN Project ON Issue.ProjectID = Project.ProjectID \
+                WHERE Project.Name = 'DASy JLR L663' \
+                    AND Issue.Flagged LIKE '%Impediment%' \
+                    AND Issue.Status != 'Closed' "
         cursor.execute(query)
         sqlData = cursor.fetchall()
         dataset = pd.DataFrame(data=sqlData)
@@ -641,6 +698,7 @@ class Main(object, metaclass=Singleton):
             issueDataDict["Assignee"] = issueDataDict["Assignee"].decode()
             issueDataDict["Priority"] = issueDataDict["Priority"].decode()
             issueDataDict["Status"] = issueDataDict["Status"].decode()
+            
 
             for row in dbProjectData:
                 if issueDataDict["ProjectID"] == row[1]:
@@ -844,9 +902,16 @@ class Main(object, metaclass=Singleton):
             else:
                 totalSPofOpenTasks = 0
 
+            #get SP of Blocked tasks (without subtasks)
+            dataset5 = dbOps.getMainTasksStoryPointsBlocked(cursor, pd)
+            if dataset5[1].iloc[0] != '':
+                totalSPofBlockedTasks = dataset5[1].iloc[0]
+            else:
+                totalSPofBlockedTasks = 0
+
             resultDictOverall['ActualInProgress_SPsum'] = float(totalSPofOpenSubtasks + totalSPofOpenTasks)
             #logger.info("    Actual In Progress (IST): {}".format(resultDictOverall['ActualInProgress_SPsum']))
-            resultDictOverall['ActualBlockedReq_SPsum'] = 0
+            resultDictOverall['ActualBlockedReq_SPsum'] = float(totalSPofBlockedTasks)
             #logger.info("    Actual blocked Req. (IST): {}".format(resultDictOverall['ActualBlockedReq_SPsum']))
             resultDictOverall['ActualSummaryReq_SPsum'] = float(resultDictOverall['ActualTestedReq_SPsum'] + resultDictOverall['ActualInProgress_SPsum'] + resultDictOverall['ActualBlockedReq_SPsum'])
             #logger.info("    Actual Summary (IST): {}".format(resultDictOverall['ActualSummaryReq_SPsum']))
@@ -889,9 +954,16 @@ class Main(object, metaclass=Singleton):
             else:
                 totalSPofOpenTasksIDC5 = 0
 
+            #get SP of Blocked tasks (without subtasks) for IDC5
+            dataset5 = dbOps.getMainTasksStoryPointsBlocked_IDC5(cursor, pd)
+            if dataset5[1].iloc[0] != '':
+                totalSPofBlockedTasksIDC5 = dataset5[1].iloc[0]
+            else:
+                totalSPofBlockedTasks = 0
+
             resultDictIDC5['ActualInProgress_SPsum'] = float(totalSPofOpenSubtasksIDC5 + totalSPofOpenTasksIDC5)
             #logger.info("    Actual In Progress (IST): {}".format(resultDictIDC5['ActualInProgress_SPsum']))
-            resultDictIDC5['ActualBlockedReq_SPsum'] = 0
+            resultDictIDC5['ActualBlockedReq_SPsum'] = float(totalSPofBlockedTasksIDC5)
             #logger.info("    Actual blocked Req. (IST): {}".format(resultDictIDC5['ActualBlockedReq_SPsum']))
             resultDictIDC5['ActualSummaryReq_SPsum'] = float(resultDictIDC5['ActualTestedReq_SPsum'] + resultDictIDC5['ActualInProgress_SPsum'] + resultDictIDC5['ActualBlockedReq_SPsum'])
             #logger.info("    Actual Summary (IST): {}".format(resultDictIDC5['ActualSummaryReq_SPsum']))
@@ -934,9 +1006,16 @@ class Main(object, metaclass=Singleton):
             else:
                 totalSPofOpenTasksMAP = 0
 
+            #get SP of Blocked tasks (without subtasks) for MAP
+            dataset5 = dbOps.getMainTasksStoryPointsBlocked_MAP(cursor, pd)
+            if dataset5[1].iloc[0] != '':
+                totalSPofBlockedTasksMAP = dataset5[1].iloc[0]
+            else:
+                totalSPofBlockedTasksMAP = 0
+
             resultDictMAP['ActualInProgress_SPsum'] = float(totalSPofOpenSubtasksMAP + totalSPofOpenTasksMAP)
             #logger.info("    Actual In Progress (IST): {}".format(resultDictMAP['ActualInProgress_SPsum']))
-            resultDictMAP['ActualBlockedReq_SPsum'] = 0
+            resultDictMAP['ActualBlockedReq_SPsum'] = float(totalSPofBlockedTasksMAP)
             #logger.info("    Actual blocked Req. (IST): {}".format(resultDictMAP['ActualBlockedReq_SPsum']))
             resultDictMAP['ActualSummaryReq_SPsum'] = float(resultDictMAP['ActualTestedReq_SPsum'] + resultDictMAP['ActualInProgress_SPsum'] + resultDictMAP['ActualBlockedReq_SPsum'])
             #logger.info("    Actual Summary (IST): {}".format(resultDictMAP['ActualSummaryReq_SPsum']))
@@ -980,16 +1059,19 @@ class Main(object, metaclass=Singleton):
             else:
                 totalSPofOpenTasksJLR = 0
 
+            #get SP of Blocked tasks (without subtasks) for JL
+            dataset5 = dbOps.getMainTasksStoryPointsBlocked_JLR(cursor, pd)
+            if dataset5[1].iloc[0] != '':
+                totalSPofBlockedTasksJLR = dataset5[1].iloc[0]
+            else:
+                totalSPofBlockedTasksJLR = 0
+
             resultDictJLR['ActualInProgress_SPsum']  = float(totalSPofOpenSubtasksJLR + totalSPofOpenTasksJLR)
             #logger.info("    Actual In Progress (IST): {}".format(resultDictJLR['ActualInProgress_SPsum']))
-            resultDictJLR['ActualBlockedReq_SPsum'] = 0
+            resultDictJLR['ActualBlockedReq_SPsum'] = float(totalSPofBlockedTasksJLR)
             #logger.info("    Actual blocked Req. (IST): {}".format(resultDictJLR['ActualBlockedReq_SPsum']))
             resultDictJLR['ActualSummaryReq_SPsum'] = float(resultDictJLR['ActualTestedReq_SPsum'] + resultDictJLR['ActualInProgress_SPsum'] + resultDictJLR['ActualBlockedReq_SPsum'])
             #logger.info("    Actual Summary (IST): {}".format(resultDictJLR['ActualSummaryReq_SPsum']))
-
-        except KeyError:
-            print("KeyError: Please, insert subtasks")
-            exit()
 
     def main(self):
         initStruct = {}
