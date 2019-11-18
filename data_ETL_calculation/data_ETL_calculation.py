@@ -696,7 +696,6 @@ class Main(object, metaclass=Singleton):
             issueDataDict["Summary"] = issueDataDict["Summary"].decode()
             issueDataDict["IssueKey"] = issueDataDict["IssueKey"].decode()
             issueDataDict["Assignee"] = issueDataDict["Assignee"].decode()
-            issueDataDict["Priority"] = issueDataDict["Priority"].decode()
             issueDataDict["Status"] = issueDataDict["Status"].decode()
             
 
@@ -744,7 +743,6 @@ class Main(object, metaclass=Singleton):
                 subtaskDataDict["Factor"] = ""
                 del subtaskDataDict["ProjectID"]
                 del subtaskDataDict["SubTasks"]
-                del subtaskDataDict["ProblemType"]
                 del subtaskDataDict["IssueType"]
 
                 # check if Subtask already exists
