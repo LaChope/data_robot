@@ -8,67 +8,110 @@ import plotly
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+
 #Get the .csv files
 df_overall = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\WeeklyReportResults.csv')
 df_DAI = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\ResultsIDC5.csv')
 df_MAP = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\ResultsMAP.csv')
 df_JLR = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\ResultsJLR.csv')
-print(df_overall.head())
 
 #app layout
-app=dash.Dash(__name__)
+app=dash.Dash()
 server=app.server
-app.layout=html.Div([
-    html.H2('My Dash App'),
-    dt.DataTable(
-        id='ResultsIDC5',
-        columns=[{"name": i, "id": i} for i in df_DAI.columns],
-        data=df_DAI.to_dict('records')
-    ),
-    html.Div(id='datatable'),
-    dcc.Graph(
-        id='datatable-subplots'
+
+Header = html.Div([
+    html.H1('Test Center Weekly Status 2019 CW 46 '),
+    html.H2('Number of opened DAI, JLR, MAP -tickets per week '),
+    dcc.Graph(id='datatable-subplots')
+])
+
+filters = html.Div([
+    html.Div([
+        dt.DataTable(
+            id='ResultsIDC5',
+            columns=[{"name": i, "id": i} for i in df_DAI.columns],
+            data=df_DAI.to_dict('records'),
+            editable=False,
+            row_selectable='multi',
+            filter_action='native',
+            sort_action='native',
+            selected_rows=[]
+        )
+    ], style={'width': '50%', 'display': 'inline-block'}),
+    
+    html.Div([
+        dt.DataTable(
+            id='overall',
+            columns=[{"name": i, "id": i} for i in df_overall.columns],
+            data=df_overall.to_dict('records'),
+            editable=False,
+            row_selectable='multi',
+            filter_action='native',
+            sort_action='native',
+            selected_rows=[]
+            )
+    ], style={'width': '50%', 'display': 'inline-block'})
+])
+
+app.layout = html.Div(children=[Header, filters])
+
+@app.callback(Output('ResultsIDC5', 'selected_rows'), 
+            [Input('datatable-subplots', 'clickData')], 
+            [State('ResultsIDC5', 'selected_rows')])
+
+def updated_selected_row_indices(clickData, selected_rows):
+    if clickData:
+        for point in clickData['points']:
+            if point['pointNumber'] in selected_rows:
+                selected_rows.remove(point['pointNumber'])
+            else:
+                selected_rows.append(point['pointNumber'])
+    return selected_rows
+
+
+
+@app.callback(
+    Output('datatable-subplots', 'figure'), 
+    [Input('ResultsIDC5', 'data'),
+    Input('ResultsIDC5', 'selected_rows')]
     )
-    ], style={'width': '60%'})
 
-@app.callback(Output('datatable-subplots', 'figure'), [Input('ResultsIDC5', 'data'), Input('ResultsIDC5', 'columns')])
+def update_figure(data, selected_rows):
+    dff = pd.DataFrame(data)
+    fig = plotly.subplots.make_subplots(rows=2, cols=3, 
+    subplot_titles=("Total close", "Number of Opened Tickets / Week", "Total in Progress", "Opened HAFMap-tickets and SP","Opened DAI-tickets and SP","Opened JLR-tickets and SP"),
+    shared_xaxes=True)
 
-def update_figure(data, selected_row_indices):
-    dff = pd.Dataframe(data)
-    fig = plotly.tools.make_subplots(rows=2, cols=3, 
-    subplot_titles=("Total close", "Number of Opened Tickets / Week", "Total in Progress", "Opened HAFMap-tickets and SP","Opened DAI-tickets and SP","Opened JLR-tickets and SP"))
+
 
     #Add traces for Total Close
-    fig.add_trace(go.Scatter(x = df_overall["CW"], y = df_DAI["ClosedTicketsTotal_perCW"], name = "DAI", line={'color': 'green'}), row=1, col=1)
-    fig.add_trace(go.Scatter(x = df_overall["CW"], y = df_JLR["ClosedTicketsTotal_perCW"], name = "JLR", line={'color': 'purple'}), row=1, col=1)
-    fig.add_trace(go.Scatter(x = df_overall["CW"], y = df_MAP["ClosedTicketsTotal_perCW"], name = "MAP", line={'color': 'grey'}), row=1, col=1)
+    fig.add_trace(go.Scatter(x = dff["ResultsID"], y = df_DAI["ClosedTicketsTotal_perCW"], name = "DAI", line={'color': 'green'}), row=1, col=1)
+    fig.add_trace(go.Scatter(x = dff["ResultsID"], y = df_JLR["ClosedTicketsTotal_perCW"], name = "JLR", line={'color': 'purple'}), row=1, col=1)
+    fig.add_trace(go.Scatter(x = dff["ResultsID"], y = df_MAP["ClosedTicketsTotal_perCW"], name = "MAP", line={'color': 'grey'}), row=1, col=1)
 
     #Add traces for Number of Opened Tickets / Week
-    fig.add_trace(go.Scatter(x = df_overall["CW"], y = df_DAI["OpenTickets_perCW_Count"], name = "DAI", line={'color': 'green'}, showlegend=False), row=1, col=2)
-    fig.add_trace(go.Scatter(x = df_overall["CW"], y = df_JLR["OpenTickets_perCW_Count"], name = "JLR", line={'color': 'purple'}, showlegend=False), row=1, col=2)
-    fig.add_trace(go.Scatter(x = df_overall["CW"], y = df_MAP["OpenTickets_perCW_Count"], name = "MAP", line={'color': 'grey'}, showlegend=False), row=1, col=2)
+    fig.add_trace(go.Scatter(x = dff["ResultsID"], y = df_DAI["OpenTickets_perCW_Count"], name = "DAI", line={'color': 'green'}, showlegend=False), row=1, col=2)
+    fig.add_trace(go.Scatter(x = dff["ResultsID"], y = df_JLR["OpenTickets_perCW_Count"], name = "JLR", line={'color': 'purple'}, showlegend=False), row=1, col=2)
+    fig.add_trace(go.Scatter(x = dff["ResultsID"], y = df_MAP["OpenTickets_perCW_Count"], name = "MAP", line={'color': 'grey'}, showlegend=False), row=1, col=2)
 
     #Add traces for Total in Progress
-    fig.add_trace(go.Scatter(x = df_overall["CW"], y = df_DAI["InProgressTicketsTotal"], name = "DAI", line={'color': 'green'}, showlegend=False), row=1, col=3)
-    fig.add_trace(go.Scatter(x = df_overall["CW"], y = df_JLR["InProgressTicketsTotal"], name = "JLR", line={'color': 'purple'}, showlegend=False), row=1, col=3)
-    fig.add_trace(go.Scatter(x = df_overall["CW"], y = df_MAP["InProgressTicketsTotal"], name = "MAP", line={'color': 'grey'}, showlegend=False), row=1, col=3)
+    fig.add_trace(go.Scatter(x = dff["ResultsID"], y = df_DAI["InProgressTicketsTotal"], name = "DAI", line={'color': 'green'}, showlegend=False), row=1, col=3)
+    fig.add_trace(go.Scatter(x = dff["ResultsID"], y = df_JLR["InProgressTicketsTotal"], name = "JLR", line={'color': 'purple'}, showlegend=False), row=1, col=3)
+    fig.add_trace(go.Scatter(x = dff["ResultsID"], y = df_MAP["InProgressTicketsTotal"], name = "MAP", line={'color': 'grey'}, showlegend=False), row=1, col=3)
 
     #Add traces for Opened HAFMap-tickets and SP
-    fig.add_trace(go.Scatter(x = df_overall["CW"], y = df_MAP["OpenTickets_perCW_SPsum"], name = "MAP", line={'color': 'grey'}, showlegend=False), row=2, col=1)
-    fig.add_trace(go.Bar(x = df_overall["CW"], y = df_MAP["OpenTicketsTotal"], name = "MAP", marker=dict(color='blue')), row=2, col=1)
+    fig.add_trace(go.Scatter(x = dff["ResultsID"], y = df_MAP["OpenTickets_perCW_SPsum"], name = "MAP", line={'color': 'grey'}, showlegend=False), row=2, col=1)
+    fig.add_trace(go.Bar(x = dff["ResultsID"], y = df_MAP["OpenTicketsTotal"], name = "MAP"), row=2, col=1)
 
     #Add traces for Opened DAI-tickets and SP
-    fig.add_trace(go.Scatter(x = df_overall["CW"], y = df_DAI["OpenTickets_perCW_SPsum"], name = "DAI", showlegend=False), row=2, col=2)
-    fig.add_trace(go.Bar(x = df_overall["CW"], y = df_DAI["OpenTicketsTotal"], name = "DAI", marker=dict(color='blue'), showlegend=False), row=2, col=2)
+    fig.add_trace(go.Scatter(x = dff["ResultsID"], y = df_DAI["OpenTickets_perCW_SPsum"], name = "DAI", showlegend=False), row=2, col=2)
+    fig.add_trace(go.Bar(x = dff["ResultsID"], y = df_DAI["OpenTicketsTotal"], name = "DAI",  showlegend=False), row=2, col=2)
 
     #Add traces for Opened JLR-tickets and SP
-    fig.add_trace(go.Scatter(x = df_overall["CW"], y = df_JLR["OpenTickets_perCW_SPsum"], name = "JLR", line={'color': 'purple'}, showlegend=False), row=2, col=3)
-    fig.add_trace(go.Bar(x = df_overall["CW"], y = df_JLR["OpenTicketsTotal"], name = "JLR", marker=dict(color='blue'), showlegend=False), row=2, col=3)
-    
-
-    fig.update_layout(title_text="Test Center Weekly Status 2019 CW 46 Number of opened DAI, JLR, MAP -tickets per week")
-    fig.show()
-    print(dff)
+    fig.add_trace(go.Scatter(x = dff["ResultsID"], y = df_JLR["OpenTickets_perCW_SPsum"], name = "JLR", line={'color': 'purple'}, showlegend=False), row=2, col=3)
+    fig.add_trace(go.Bar(x = dff["ResultsID"], y = df_JLR["OpenTicketsTotal"], name = "JLR",  showlegend=False), row=2, col=3)
+        
+    return fig
 
 app.css.append_css({
     'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'
