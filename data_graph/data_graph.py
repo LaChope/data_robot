@@ -9,24 +9,33 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 
-#Get the .csv files
+#-----------------Get the .csv files-----------------------------------------------
 df_overall = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\WeeklyReportResults.csv')
 df_DAI = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\ResultsIDC5.csv')
 df_MAP = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\ResultsMAP.csv')
 df_JLR = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\ResultsJLR.csv')
 
-#app layout
+
+#------------------app layout------------------------------------------------------
 app=dash.Dash()
 server=app.server
 
 Header = html.Div([
     html.H1('Test Center Weekly Status 2019 CW 46 '),
     html.H2('Number of opened DAI, JLR, MAP -tickets per week '),
-    dcc.Graph(id='datatable-subplots')
 ])
 
 filters = html.Div([
     html.Div([
+        dcc.Graph(id='datatable-subplots'),
+        dcc.Slider(
+            id='year-slider',
+            min=df_DAI['ResultsID'].min(),
+            max=df_DAI['ResultsID'].max(),
+            value=df_DAI['ResultsID'].min(),
+            marks={str(year): str(year) for year in df_DAI['ResultsID'].unique()},
+            step=None
+        ),
         dt.DataTable(
             id='ResultsIDC5',
             columns=[{"name": i, "id": i} for i in df_DAI.columns],
@@ -55,6 +64,7 @@ filters = html.Div([
 
 app.layout = html.Div(children=[Header, filters])
 
+#-------------app callbacks-------------------------------------------
 @app.callback(Output('ResultsIDC5', 'selected_rows'), 
             [Input('datatable-subplots', 'clickData')], 
             [State('ResultsIDC5', 'selected_rows')])
@@ -81,8 +91,6 @@ def update_figure(data, selected_rows):
     fig = plotly.subplots.make_subplots(rows=2, cols=3, 
     subplot_titles=("Total close", "Number of Opened Tickets / Week", "Total in Progress", "Opened HAFMap-tickets and SP","Opened DAI-tickets and SP","Opened JLR-tickets and SP"),
     shared_xaxes=True)
-
-
 
     #Add traces for Total Close
     fig.add_trace(go.Scatter(x = dff["ResultsID"], y = df_DAI["ClosedTicketsTotal_perCW"], name = "DAI", line={'color': 'green'}), row=1, col=1)
