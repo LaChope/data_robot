@@ -8,26 +8,20 @@ import plotly
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-
+from app import app
 #-----------------Get the .csv files-----------------------------------------------
 df_overall = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\WeeklyReportResults.csv')
 df_DAI = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\ResultsIDC5.csv')
 df_MAP = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\ResultsMAP.csv')
 df_JLR = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\ResultsJLR.csv')
 
-
-#------------------app layout------------------------------------------------------
-app=dash.Dash()
-server=app.server
-
 layout_OverallPerWeek = html.Div([
     html.H1('Test Center Weekly Status 2019 CW 47'),
     html.H2('Number of opened DAI, JLR, MAP -tickets per week'),
     #Database Subplot
     html.Div([
-        dcc.Graph(id='datatable-subplots'),
-    ], style={'width': '100%'}
-    ),
+        dcc.Graph(id='datatable-subplots-OverallPerWeek')
+    ]),
 
     #Slider
     html.Div([
@@ -44,7 +38,7 @@ layout_OverallPerWeek = html.Div([
     #First dt
     html.Div([
             dt.DataTable(
-            id='ResultsIDC5',
+            id='TableResultsIDC5',
             columns=[{"name": i, "id": i} for i in df_DAI.columns],
             data=df_DAI.to_dict('records'),
             editable=False,
@@ -70,18 +64,17 @@ layout_OverallPerWeek = html.Div([
             )
     ], style={'width': '50%', 'display': 'inline-block'}
     ),
-    html.Div([
-    dcc.Location(id='url', refresh=False),
-    html.Div(id='OverallperWeek')
-    ])
+    
+    html.Div(id='OverallPerWeek'),
+    html.Br()
 ])
 
 app.layout = html.Div(children=[layout_OverallPerWeek])
 
 #-------------app callbacks-------------------------------------------
-@app.callback(Output('ResultsIDC5', 'selected_rows'), 
-            [Input('datatable-subplots', 'clickData')], 
-            [State('ResultsIDC5', 'selected_rows')])
+@app.callback(Output('TableResultsIDC5', 'selected_rows'), 
+            [Input('datatable-subplots-OverallPerWeek', 'clickData')], 
+            [State('TableResultsIDC5', 'selected_rows')])
 
 def updated_selected_row_indices(clickData, selected_rows):
     if clickData:
@@ -93,18 +86,18 @@ def updated_selected_row_indices(clickData, selected_rows):
     return selected_rows
 
 @app.callback(
-    Output('datatable-subplots', 'figure'), 
-    [Input('ResultsIDC5', 'data'),
-    Input('ResultsIDC5', 'selected_rows')]
+    Output('datatable-subplots-OverallPerWeek', 'figure'), 
+    [Input('TableResultsIDC5', 'data'),
+    Input('TableResultsIDC5', 'selected_rows')]
     )
 
 def update_figure(data, selected_rows):
     dff = pd.DataFrame(data)
-    fig = plotly.subplots.make_subplots(rows=2, cols=3,
+    fig = plotly.subplots.make_subplots(rows=2, cols=3, 
     subplot_titles=("Total close", "Number of Opened Tickets / Week", "Total in Progress", "Opened HAFMap-tickets and SP","Opened DAI-tickets and SP","Opened JLR-tickets and SP"),
     shared_xaxes=True)
 
-   #Add traces for Total Close
+    #Add traces for Total Close
     fig.add_trace(go.Scatter(x = dff["ResultsID"], y = df_DAI["ClosedTicketsTotal_perCW"], name = "DAI", line={'color': 'green'}), row=1, col=1)
     fig.add_trace(go.Scatter(x = dff["ResultsID"], y = df_JLR["ClosedTicketsTotal_perCW"], name = "JLR", line={'color': 'purple'}), row=1, col=1)
     fig.add_trace(go.Scatter(x = dff["ResultsID"], y = df_MAP["ClosedTicketsTotal_perCW"], name = "MAP", line={'color': 'grey'}), row=1, col=1)
@@ -141,5 +134,3 @@ app.css.append_css({
 
 if __name__ == '__main__':
     app.run_server(debug=False)
-    
-
