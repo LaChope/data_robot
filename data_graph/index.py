@@ -1,13 +1,14 @@
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
-from app import server
 from app import app
-import OverallPerWeek, OverallTotal, DAI, HAFMAP, JLR
+from app import server
+from layouts import OverallPerWeek, OverallTotal, DAI, HAFMAP, JLR
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     dcc.Link('Navigate to "/OverallPerWeek"', href='/OverallPerWeek'),
+
     html.Br(),
     dcc.Link('Navigate to "/OverallTotal"', href='/OverallTotal'),
     html.Div(id='page-content')
