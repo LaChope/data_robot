@@ -32,50 +32,27 @@ layout = html.Div([
                 'Test Center Weekly Status 2019 CW 47',
                 style={'font-family': 'Helvetica',
                        "margin-top": "25",
-                       "margin-bottom": "0"},
-                className='eight columns',
+                       "margin-bottom": "0",
+                       'display': 'inline-block'
+                       },
             ),
             html.Img(
                 src='http://www.dwglogo.com/wp-content/uploads/2017/01/Alten-Logo.png',
-                className='two columns',
                 style={
-                    'height': '9%',
-                    'width': '9%',
-                    'float': 'left',
+                    'height': '15%',
+                    'width': '15%',
+                    'float': 'right',
                     'position': 'relative',
+                    'display': 'inline-block'
                 },
             ),
             html.P(
                 'Overview',
                 style={'font-family': 'Helvetica',
-                       "font-size": "120%",
-                       "width": "80%"},
-                className='ten columns',
+                       "font-size": "200%",
+                       "width": "100%"},
             ),
         ],
-        className='row'
-    ),
-
-    #RangeSlider
-    html.Div(
-        [
-            html.Div(
-                [
-                    dcc.RangeSlider(
-
-                        id='CW-RangeSlider-OverallPerWeek',
-                        min=df_overall['CW'].min(),
-                        max=df_overall['CW'].max(),
-                        value=[df_overall['CW'].min(), df_overall['CW'].max()],
-                        marks={str(CW): str(CW) for CW in df_overall['CW'].unique()},
-                        step=None
-                    )
-                ],
-                className='five columns',
-                style={'margin': '15', 'padding-left': '10'}
-            ),
-        ],
-        className='row'
     ),
         
     #Database Subplot
@@ -85,36 +62,25 @@ layout = html.Div([
                 [
                     dcc.Graph(
                         id='datatable-subplots-OverallPerWeek',
-                        style={'width': '100%', 'margin-left':'auto', 'margin-right':'auto'}
                     )
                 ],
-                className='five columns',
-                style={'margin': '15', 'padding-left': '10'}
             ),
-        ],  
-    ),
-
-    #OverallperWeek DataTable
-    html.Div(
-        [
             html.Div(
-                [
-                    dt.DataTable(
-                        id='WeeklyReportResults',
-                        columns=[{"name": i, "id": i} for i in df_overall.columns],
-                        data=df_overall.to_dict('records'),
-                        editable=False,
-                        row_selectable='multi',
-                        filter_action='native',
-                        sort_action='native',
-                        selected_rows=[]
-                     )
-                ],
-                className='five columns',
-                style={'width': '50%', 'margin-left':'0%', 'margin-right':'5%', 'margin-down':'5%'}
-            )
+                    [
+                        dcc.RangeSlider(
+                            id='CW-RangeSlider-OverallPerWeek',
+                            min=df_overall['CW'].min(),
+                            max=df_overall['CW'].max(),
+                            value=[df_overall['CW'].min(), df_overall['CW'].max()],
+                            marks={str(CW): str(CW) for CW in df_overall['CW'].unique()},
+                            step=None
+                        )
+                    ],
+                    style={'width': '80%', 'display': 'inline-block'}
+                ),
         ],
-    )
+        style={'width': '49%', 'display': 'inline-block'}
+    ),
 ]) 
 
 
@@ -136,7 +102,7 @@ def update_figure(value):
     fig.add_trace(go.Bar(x = filtered_df['CW'], y = filtered_df["ActualBlockedReq_SPsum"], name = "Actual blocked", marker=dict(color='grey')))
 
     fig.update_layout(
-    height=700, width=1900, transition={'duration':1000}
+        transition={'duration':1000}
     )
             
     return fig
