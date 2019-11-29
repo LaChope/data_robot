@@ -3,7 +3,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 from app import app
 from app import server
-from layouts import  HAFMAP, JLR, home
+from layouts import  home, DAI, HAFMAP, JLR
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
