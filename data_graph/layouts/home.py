@@ -3,11 +3,11 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash.dependencies
 from dash.dependencies import Input, Output, State
-import dash_table as dt
 import plotly
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.io as pio
+
 
 #Import module from parent folder
 import os,sys,inspect
@@ -234,7 +234,7 @@ def update_figure_OverallTotal(value):
     filtered_df = df_overall[(df_overall['CW'] >= value[0]) & (df_overall['CW'] <= value[1])]
     fig = go.Figure()
 
-    #Add traces for Total Close
+    #Add traces for OverallTotal
     fig.add_trace(go.Scatter(x = filtered_df['CW'], y = filtered_df["ActualSummaryReq_SPsum"], name = "Actual Summary", line={'color': 'orangered'}))
     fig.add_trace(go.Bar(x = filtered_df['CW'], y = filtered_df["ActualTestedReq_SPsum"], name = "Actual tested", marker=dict(color='skyblue')))
     fig.add_trace(go.Bar(x = filtered_df['CW'], y = filtered_df["ActualInProgress_SPsum"], name = "Actual in progress", marker=dict(color='orange')))
@@ -259,7 +259,7 @@ def update_figure_DAI(value):
     filtered_df = df_overall[(df_overall['CW'] >= value[0]) & (df_overall['CW'] <= value[1])]
     fig = go.Figure()
 
-    #Add traces for Total Close
+    #Add traces for DAI
     fig.add_trace(go.Scatter(x = filtered_df['CW'], y = df_DAI["ActualSummaryReq_SPsum"], name = "Actual Summary", line={'color': 'orangered'}))
     fig.add_trace(go.Bar(x = filtered_df['CW'], y = df_DAI["ActualTestedReq_SPsum"], name = "Actual tested", marker=dict(color='skyblue')))
     fig.add_trace(go.Bar(x = filtered_df['CW'], y = df_DAI["ActualInProgress_SPsum"], name = "Actual in progress", marker=dict(color='orange')))
@@ -284,7 +284,7 @@ def update_figure_MAP(value):
     filtered_df = df_overall[(df_overall['CW'] >= value[0]) & (df_overall['CW'] <= value[1])]
     fig = go.Figure()
 
-    #Add traces for Total Close
+    #Add traces for MAP
     fig.add_trace(go.Scatter(x = filtered_df['CW'], y = df_MAP["ActualSummaryReq_SPsum"], name = "Actual Summary", line={'color': 'orangered'}))
     fig.add_trace(go.Bar(x = filtered_df['CW'], y = df_MAP["ActualTestedReq_SPsum"], name = "Actual tested", marker=dict(color='skyblue')))
     fig.add_trace(go.Bar(x = filtered_df['CW'], y = df_MAP["ActualInProgress_SPsum"], name = "Actual in progress", marker=dict(color='orange')))
@@ -310,7 +310,7 @@ def update_figure_JLR(value):
     filtered_df = df_overall[(df_overall['CW'] >= value[0]) & (df_overall['CW'] <= value[1])]
     fig = go.Figure()
 
-    #Add traces for Total Close
+    #Add traces for JLR
     fig.add_trace(go.Scatter(x = filtered_df['CW'], y = df_JLR["ActualSummaryReq_SPsum"], name = "Actual Summary", line={'color': 'orangered'}))
     fig.add_trace(go.Bar(x = filtered_df['CW'], y = df_JLR["ActualTestedReq_SPsum"], name = "Actual tested", marker=dict(color='skyblue')))
     fig.add_trace(go.Bar(x = filtered_df['CW'], y = df_JLR["ActualInProgress_SPsum"], name = "Actual in progress", marker=dict(color='orange')))
