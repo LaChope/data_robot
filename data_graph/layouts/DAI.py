@@ -4,7 +4,7 @@ import dash_html_components as html
 import dash_table as dt
 import dash.dependencies
 from dash.dependencies import Input, Output, State
-import plotly
+import plotly, sqlite3, sqlalchemy
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.io as pio
@@ -20,7 +20,8 @@ from navbar import Navbar
 pio.templates.default = "plotly_white"
 
 #-----------------Get the .csv files-----------------------------------------------
-df_overall = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\WeeklyReportResults.csv')
+SQLACHEMY_CON='C:\\Alten\\Internal_Project\\Data_repository\\Alten_metrics.db'
+df_overall = pd.read_sql_table(SQLACHEMY_CON, 'WeeklyReportResults')
 df_DAI = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\ResultsIDC5.csv')
 
 #-----------------Layout----------------------------------------------------------
@@ -88,6 +89,7 @@ layout = html.Div([
         style={'width': '100%', 'margin-top': '5%'}
     ),
 
+    #DataTable
     html.Div(
         [
             dt.DataTable(

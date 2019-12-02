@@ -88,6 +88,7 @@ layout = html.Div([
         style={'width': '100%', 'margin-top': '5%'}
     ),
 
+    #DataTable
     html.Div(
         [
             dt.DataTable(
