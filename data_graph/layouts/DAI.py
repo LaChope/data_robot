@@ -15,14 +15,18 @@ currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfram
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
 from app import app
+from navbar import Navbar
 
 pio.templates.default = "plotly_white"
+
+nav = Navbar()
 
 #-----------------Get the .csv files-----------------------------------------------
 df_overall = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\WeeklyReportResults.csv')
 df_DAI = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\ResultsIDC5.csv')
 
 layout = html.Div([
+    nav,
     #Title
     html.Div(
         [

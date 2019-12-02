@@ -15,8 +15,11 @@ currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfram
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
 from app import app
+from navbar import Navbar
 
 pio.templates.default = "plotly_white"
+
+nav = Navbar()
 
 #-----------------Get the .csv files-----------------------------------------------
 df_overall = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\WeeklyReportResults.csv')
@@ -24,7 +27,7 @@ df_DAI = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\
 df_MAP = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\ResultsMAP.csv')
 df_JLR = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\ResultsJLR.csv')
 
-layout = html.Div([
+home_layout = html.Div([
     #Title
     html.Div(
         [
@@ -169,6 +172,16 @@ layout = html.Div([
         ]
     )
 ]) 
+
+def Homepage():
+    layout = html.Div(
+        [
+            nav,
+            home_layout
+        ]
+    )
+
+    return layout
 
 
 

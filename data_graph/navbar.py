@@ -4,22 +4,21 @@ def Navbar():
     navbar = dbc.NavbarSimple(
 
         children=[
-            dbc.NavItem(dbc.NavLink("Time-Series", href="/time-series")),
             dbc.DropdownMenu(
                 nav=True,
                 in_navbar=True,
-                label="Menu",
+                label="Select Project",
                 children=[
-                    dbc.DropdownMenuItem("Entry 1"),
-                    dbc.DropdownMenuItem("Entry 2"),
-                    dbc.DropdownMenuItem(divider=True),
-                    dbc.DropdownMenuItem("Entry 3"),
+                    dbc.DropdownMenuItem("Overview", href='/home'),
+                    dbc.DropdownMenuItem("DAI", href='/DAI'),
+                    dbc.DropdownMenuItem("MAP", href='/HAFMAP'),
+                    dbc.DropdownMenuItem("JLR", href='/JLR'),
                     ],
                 ),
             ],
           brand="Home",
           brand_href="/home",
-          sticky="top",
+          sticky="top"
     )
 
-return navbar
+    return navbar
