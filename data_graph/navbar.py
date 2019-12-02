@@ -9,7 +9,6 @@ def Navbar():
                 in_navbar=True,
                 label="Select Project",
                 children=[
-                    dbc.DropdownMenuItem("Overview", href='/home'),
                     dbc.DropdownMenuItem("DAI", href='/DAI'),
                     dbc.DropdownMenuItem("MAP", href='/HAFMAP'),
                     dbc.DropdownMenuItem("JLR", href='/JLR'),
@@ -18,7 +17,7 @@ def Navbar():
             ],
           brand="Home",
           brand_href="/home",
-          sticky="top"
+          sticky="top",
     )
 
     return navbar

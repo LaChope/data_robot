@@ -99,7 +99,8 @@ layout = html.Div([
                 column_selectable='multi',
                 style_header={
                     'backgroundColor': 'white',
-                    'fontWeight': 'bold'
+                    'fontWeight': 'bold',
+                    'width': 'auto'
                 },
                 style_data_conditional=[
                     {
@@ -107,9 +108,15 @@ layout = html.Div([
                         'backgroundColor': 'rgb(248, 248, 248)'
                     }
                 ],
+                style_table={'overflowX': 'scroll'},
+                style_cell={
+                    'minWidth': '0px', 'maxWidth': '200px',
+                    'overflow': 'hidden',
+                    'textOverflow': 'ellipsis'
+                },
             )
         ],
-        style={'width': '80%', 'margin-left': '5%', 'margin-top': '5%', 'margin-bottom': '5%'}
+        style={'width': '85%', 'margin-left': '5%', 'margin-top': '5%', 'margin-bottom': '5%'}
     )
 ])
 
