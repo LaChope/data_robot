@@ -7,7 +7,7 @@ import plotly
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.io as pio
-import configparser
+
 
 
 #Import module from parent folder
@@ -15,19 +15,10 @@ import os,sys,inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
-from app import app
+from app import app, GetWeekNumber
 from navbar import Navbar
 
 pio.templates.default = "plotly_white"
-
-
-def GetWeekNumber():
-    init=configparser.ConfigParser()
-    configFilePath='C:\Alten\Internal_Project\Scripts\data_robot\data_graph\data_graph_service.ini'
-    init.read(configFilePath)
-    Week_number = init.get('generic', 'week_number')
-
-    return Week_number
 
 #-----------------Get the .csv files-----------------------------------------------
 df_overall = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\WeeklyReportResults.csv')

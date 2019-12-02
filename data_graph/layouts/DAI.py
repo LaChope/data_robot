@@ -14,9 +14,8 @@ import os,sys,inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
-from app import app
+from app import app, GetWeekNumber
 from navbar import Navbar
-from layouts.home import GetWeekNumber
 
 pio.templates.default = "plotly_white"
 
