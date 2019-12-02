@@ -16,22 +16,22 @@ parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
 from app import app
 from navbar import Navbar
+from layouts.home import GetWeekNumber
 
 pio.templates.default = "plotly_white"
-
-nav = Navbar()
 
 #-----------------Get the .csv files-----------------------------------------------
 df_overall = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\WeeklyReportResults.csv')
 df_MAP = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\ResultsMAP.csv')
 
+#-----------------Layout----------------------------------------------------------
 layout = html.Div([
-    nav,
+    Navbar(),
     #Title
     html.Div(
         [
             html.H1(
-                'Test Center Weekly Status 2019 CW 47',
+                'Test Center Weekly Status 2019 CW ' + GetWeekNumber(),
                 style={'font-family': 'Helvetica',
                        "margin-top": "0",
                        "margin-bottom": "0",

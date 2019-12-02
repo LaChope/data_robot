@@ -7,6 +7,7 @@ import plotly
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.io as pio
+import configparser
 
 
 #Import module from parent folder
@@ -19,7 +20,14 @@ from navbar import Navbar
 
 pio.templates.default = "plotly_white"
 
-nav = Navbar()
+
+def GetWeekNumber():
+    init=configparser.ConfigParser()
+    configFilePath='C:\Alten\Internal_Project\Scripts\data_robot\data_graph\data_graph_service.ini'
+    init.read(configFilePath)
+    Week_number = init.get('generic', 'week_number')
+
+    return Week_number
 
 #-----------------Get the .csv files-----------------------------------------------
 df_overall = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\WeeklyReportResults.csv')
@@ -27,12 +35,14 @@ df_DAI = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\
 df_MAP = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\ResultsMAP.csv')
 df_JLR = pd.read_csv('C:\\Alten\\Internal_Project\\Data_repository\\Results_DB\\CSV\\ResultsJLR.csv')
 
-home_layout = html.Div([
+#-----------------Layout----------------------------------------------------------
+layout = html.Div([
+    Navbar(),
     #Title
     html.Div(
         [
             html.H1(
-                'Test Center Weekly Status 2019 CW 47',
+                'Test Center Weekly Status 2019 CW ' + GetWeekNumber(),
                 style={'font-family': 'Helvetica',
                        "margin-top": "0",
                        "margin-bottom": "0",
@@ -172,16 +182,6 @@ home_layout = html.Div([
         ]
     )
 ]) 
-
-def Homepage():
-    layout = html.Div(
-        [
-            nav,
-            home_layout
-        ]
-    )
-
-    return layout
 
 
 

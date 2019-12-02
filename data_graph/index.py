@@ -13,9 +13,6 @@ parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
 from app import app
 from navbar import Navbar
-from layouts.home import Homepage
-
-nav = Navbar()
 
 app.layout = html.Div(
     [
@@ -29,7 +26,7 @@ app.layout = html.Div(
               [Input('url', 'pathname')])
 def display_page(pathname):
     if pathname == '/home':
-        return Homepage()
+        return home.layout
     elif pathname == '/DAI':
         return DAI.layout
     elif pathname == '/HAFMAP':
@@ -37,7 +34,7 @@ def display_page(pathname):
     elif pathname == '/JLR':
         return JLR.layout
     else:
-        return Homepage()
+        return home.layout
 
 if __name__ == '__main__':
     app.run_server(debug=False)

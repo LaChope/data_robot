@@ -10,7 +10,8 @@ app.config.suppress_callback_exceptions = True
 #Login
 #import dash_auth
 #VALID_USERNAME_PASSWORD_PAIRS = [
-#    ['username', 'password']
+#    ['mchopart2@de.alten.com', 'Spqbt2227958'],
+#    ['test', 'test2']
 #]
 #auth = dash_auth.BasicAuth(
 #    app,

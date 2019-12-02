@@ -12,8 +12,8 @@
 			 "Created": "Created", 
 			 "SubTasks": "Sub-Tasks", 
 			 "Resolved": "Resolved", 
-			 "Labels": "Labels",
-			 "Flagged": "Flagged"
+			 "Labels": "Labels"
+
 		}
 	]
 }
